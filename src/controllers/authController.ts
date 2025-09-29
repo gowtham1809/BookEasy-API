@@ -33,6 +33,13 @@ export const loginController = async (
       }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+    });
+
     res.json(user);
   } catch (error) {
     console.error("Error finding user:", error);
