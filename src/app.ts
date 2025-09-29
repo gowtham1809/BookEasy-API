@@ -1,5 +1,8 @@
 import express, { Application, NextFunction, Request, Response } from "express";
-import cors from "cors"
+import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config({ path: `.env` });
 
 // Import your routes
 import routes from "./routes/index";
@@ -11,7 +14,7 @@ const app: Application = express();
 // Middlewares
 app.use(
   cors({
-    origin: "http://localhost:3000", // your frontend origin
+    origin: process.env.FRONTEND_URL || "http://localhost:3000", // your frontend origin
     credentials: true, // allow cookies
   })
 );
