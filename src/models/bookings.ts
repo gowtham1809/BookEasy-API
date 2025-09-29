@@ -7,7 +7,7 @@ export const createBooking = async (booking: {
   booking_date: string;
 }): Promise<Booking> => {
   const result = await db.query(
-    `INSERT INTO bookings (user_id, slot_id, booking_date)
+    `INSERT INTO public.bookings (user_id, slot_id, booking_date)
      VALUES ($1, $2, $3) RETURNING *`,
     [booking.user_id, booking.slot_id, booking.booking_date]
   );
@@ -20,7 +20,7 @@ export const findBookingsByUserId = async (
 ): Promise<
   (Booking & { slot: { id: number; start_time: string; end_time: string } })[]
 > => {
-  const slotsResult = await db.query(`SELECT * FROM slots`);
+  const slotsResult = await db.query(`SELECT * FROM public.slots`);
   const slotsMap = new Map<
     number,
     { id: number; start_time: string; end_time: string }
@@ -31,7 +31,7 @@ export const findBookingsByUserId = async (
   });
 
   const bookingsResult = await db.query(
-    `SELECT * FROM bookings WHERE user_id = $1`,
+    `SELECT * FROM public.bookings WHERE user_id = $1`,
     [userId]
   );
 
@@ -44,10 +44,10 @@ export const findBookingsByUserId = async (
 };
 
 export const findAllBookings = async (): Promise<Booking[]> => {
-  const result = await db.query(`SELECT * FROM bookings`);
+  const result = await db.query(`SELECT * FROM public.bookings`);
   return result.rows;
 };
 
 export const deleteBooking = async (id: number): Promise<void> => {
-  await db.query(`DELETE FROM bookings WHERE id = $1`, [id]);
+  await db.query(`DELETE FROM public.bookings WHERE id = $1`, [id]);
 };

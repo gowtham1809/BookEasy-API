@@ -9,7 +9,7 @@ export const createUser = async (
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const result = await db.query(
-    `INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
+    `INSERT INTO public.users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
     [name, email, hashedPassword]
   );
   return result.rows[0];
@@ -19,19 +19,19 @@ export const resetPassword = async (
   user: Partial<Omit<User, "id" | "createdAt">>
 ): Promise<User | null> => {
   const result = await db.query(
-    `UPDATE users SET password = $1 WHERE email = $2 RETURNING *`,
+    `UPDATE users SET public.password = $1 WHERE email = $2 RETURNING *`,
     [user.password, user.email]
   );
   return result.rows[0] || null;
 };
 
 export const findAllUsers = async (): Promise<User[]> => {
-  const result = await db.query(`SELECT * FROM users`);
+  const result = await db.query(`SELECT * FROM public.users`);
   return result.rows;
 };
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
-  const result = await db.query(`SELECT * FROM users WHERE email = $1`, [
+  const result = await db.query(`SELECT * FROM public.users WHERE email = $1`, [
     email,
   ]);
   return result.rows[0] || null;
@@ -39,12 +39,12 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
 
 export const getUserById = async (id: string): Promise<User | null> => {
   const result = await db.query(
-    `SELECT id,name,email FROM users WHERE id = $1`,
+    `SELECT id,name,email FROM public.users WHERE id = $1`,
     [id]
   );
   return result.rows[0] || null;
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
-  await db.query(`DELETE FROM users WHERE id = $1`, [id]);
+  await db.query(`DELETE FROM public.users WHERE id = $1`, [id]);
 };
