@@ -27,18 +27,11 @@ export const loginController = async (
 
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET || "hkfhkfhjfjhgjhhg",
+      process.env.JWT_SECRET || "bookeasyforbookingslots",
       {
         expiresIn: "10h",
       }
     );
-
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + 30 * 60 * 1000), // 0.5 hour
-      sameSite: "none",
-    });
 
     res.json(user);
   } catch (error) {

@@ -6,7 +6,7 @@ import AppError from "../helper/appError";
 export const authenticated = (
   req: TRequest,
   res: Response,
-  next: NextFunction 
+  next: NextFunction
 ) => {
   const token = req?.cookies?.token || "";
   if (!token) return res.status(401).json({ message: "Unauthorized"});

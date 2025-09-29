@@ -1,5 +1,5 @@
+import dayjs from "dayjs";
 import db from "../db";
-import { Booking } from "../types/booking";
 import { Slot } from "../types/slot";
 
 export const getAvailableSlots = async (date: string): Promise<Slot[]> => {
@@ -11,6 +11,12 @@ export const getAvailableSlots = async (date: string): Promise<Slot[]> => {
     `SELECT slot_id FROM bookings WHERE booking_date::date = $1`,
     [formattedDate]
   );
+  const timeIsInFuture = (start_time: string): boolean => {
+    const today = dayjs();
+    const slotDateTime = dayjs(`${today.format("YYYY-MM-DD")}T${start_time}`);
+    return slotDateTime.isAfter(today);
+  };
+  const isToday = dayjs(date).isSame(dayjs(), "day");
   const bookedSlotIds = new Set(bookingsResult.rows.map((row) => row.slot_id));
 
   const result: Slot[] = slots.map((slot) => ({
@@ -18,7 +24,9 @@ export const getAvailableSlots = async (date: string): Promise<Slot[]> => {
     start_time: slot.start_time,
     end_time: slot.end_time,
     seats: slot.seats.toString(),
-    available: !bookedSlotIds.has(slot.id),
+    available:
+      !bookedSlotIds.has(slot.id) &&
+      (isToday ? timeIsInFuture(slot.start_time) : true),
   }));
 
   return result;
