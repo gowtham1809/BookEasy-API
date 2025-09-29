@@ -39,8 +39,8 @@ export const loginController = async (
       sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       expires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
     });
-
-    res.json(user);
+    const { password: p, ...rest } = user;
+    res.json(rest);
   } catch (error) {
     console.error("Error finding user:", error);
     return next(new AppError("Internal server error", 500));

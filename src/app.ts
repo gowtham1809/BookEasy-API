@@ -34,10 +34,40 @@ app.use(function (req, res, next) {
 
 // Global error handler
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.statusCode || 500).json({
-    status: err.status || "error",
-    message: err.message || "Internal Server Error",
+  let statusCode = err.statusCode || 500;
+  let status = err.status || "error";
+  let message = err.message;
+  let showToasts = err.showToasts ?? true;
+
+  if (process.env.NODE_ENV === "production") {
+    if ((err as any).code === 11000) {
+      statusCode = 400;
+      const value = (err as any).keyValue
+        ? JSON.stringify((err as any).keyValue)
+        : "";
+      message = `Duplicate field value: ${value}. Please use another value.`;
+    }
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    return res.status(statusCode).json({
+      status,
+      message,
+      showToasts,
+      error: err,
+      stack: err.stack,
+    });
+  }
+
+  res.status(statusCode).json({
+    status,
+    message:
+      statusCode === 500
+        ? "Something went wrong. Please try again later."
+        : message,
+    showToasts,
   });
 });
+
 
 export default app;
