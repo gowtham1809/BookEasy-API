@@ -37,6 +37,7 @@ export const loginController = async (
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       expires: new Date(Date.now() + 30 * 60 * 1000), // 0.5 hour
+      sameSite: "none",
     });
 
     res.json(user);
