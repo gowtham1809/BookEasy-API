@@ -34,7 +34,14 @@ app.use(function (req, res, next) {
 
 // Global error handler
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.statusCode || 500).json(err);
+  const errorResponse = {
+    message: err.message,
+    statusCode: err.statusCode || 500,
+    status: err.status || "error",
+    showToasts: err.showToasts ?? true,
+    stack: err.stack,
+  };
+  res.status(err.statusCode || 500).json(errorResponse);
 });
 
 export default app;
