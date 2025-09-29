@@ -34,14 +34,10 @@ app.use(function (req, res, next) {
 
 // Global error handler
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
-  const errorResponse = {
-    message: err.message,
-    statusCode: err.statusCode || 500,
+  res.status(err.statusCode || 500).json({
     status: err.status || "error",
-    showToasts: err.showToasts ?? true,
-    stack: err.stack,
-  };
-  res.status(err.statusCode || 500).json(errorResponse);
+    message: err.message || "Internal Server Error",
+  });
 });
 
 export default app;

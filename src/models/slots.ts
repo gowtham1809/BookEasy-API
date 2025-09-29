@@ -3,12 +3,12 @@ import db from "../db";
 import { Slot } from "../types/slot";
 
 export const getAvailableSlots = async (date: string): Promise<Slot[]> => {
-  const slotsResult = await db.query(`SELECT * FROM public.slots`);
+  const slotsResult = await db.query(`SELECT * FROM slots`);
   const slots = slotsResult.rows;
 
   const formattedDate = new Date(date).toISOString().split("T")[0]; // '2025-09-28'
   const bookingsResult = await db.query(
-    `SELECT slot_id FROM public.bookings WHERE booking_date::date = $1`,
+    `SELECT slot_id FROM bookings WHERE booking_date::date = $1`,
     [formattedDate]
   );
   const timeIsInFuture = (start_time: string): boolean => {
