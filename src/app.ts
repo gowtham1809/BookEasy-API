@@ -27,18 +27,14 @@ app.use("/api", routes);
 
 // 404 handler
 app.use(function (req, res, next) {
-  next({
-    status: 404,
-    message: `Can't find ${req.originalUrl} on this server!`,
-  });
+  next(
+    new AppError(`Can't find ${req.originalUrl} on this server!`, 404, true)
+  );
 });
 
 // Global error handler
 app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.statusCode || 500).json({
-    status: err.status || "error",
-    message: err.message || "Internal Server Error",
-  });
+  res.status(err.statusCode || 500).json(err);
 });
 
 export default app;

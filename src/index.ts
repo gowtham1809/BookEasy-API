@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import app from "./app";
 import db from "./db";
-// import { initDb } from "./iniDB";
+import { initDb } from "./iniDB";
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
     await db.query("SELECT NOW()");
       console.log("Connected to PostgreSQL");
       
-    // await initDb();
+    await initDb();
 
     app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);

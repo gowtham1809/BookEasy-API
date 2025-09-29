@@ -1,8 +1,11 @@
 import db from "./db";
 
 export const initDb = async () => {
+  const client = await db.connect(); // ✅ PoolClient
   try {
-    await db.query(`
+    await client.query("BEGIN");
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
@@ -12,28 +15,32 @@ export const initDb = async () => {
       )
     `);
 
-    await db.query(`
-    CREATE TABLE IF NOT EXISTS slots (
-      id SERIAL PRIMARY KEY,
-      start_time TIME NOT NULL,
-      end_time TIME NOT NULL,
-      seats INT NOT NULL
-    )
-   `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS slots (
+        id SERIAL PRIMARY KEY,
+        start_time TIME NOT NULL,
+        end_time TIME NOT NULL,
+        seats INT NOT NULL
+      )
+    `);
 
-    await db.query(`
-    CREATE TABLE IF NOT EXISTS bookings (
-      id SERIAL PRIMARY KEY,
-      user_id INT REFERENCES users(id) ON DELETE CASCADE,
-      slot_id INT REFERENCES slots(id) ON DELETE CASCADE,
-      booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE (slot_id, booking_date)
-    )
-      `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS bookings (
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id) ON DELETE CASCADE,
+        slot_id INT REFERENCES slots(id) ON DELETE CASCADE,
+        booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        booked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE (slot_id, booking_date)
+      )
+    `);
 
+    await client.query("COMMIT");
     console.log("✅ Database initialized successfully");
   } catch (err: any) {
+    await client.query("ROLLBACK");
     console.error("❌ Database initialization failed:", err.message);
+  } finally {
+    client.release(); // ✅ PoolClient has release()
   }
 };
