@@ -9,7 +9,7 @@ export const authenticated = (
   next: NextFunction
 ) => {
   const token = req?.cookies?.token || "";
-  if (!token) return res.status(401).json({ message: "Unauthorized"});
+  if (!token) return new AppError("Unauthorized, Please Login", 401, true);
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
@@ -35,4 +35,3 @@ export const authorized = (...roles: string[]) => {
     };
   };
 
-;
